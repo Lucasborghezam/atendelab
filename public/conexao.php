@@ -1,11 +1,12 @@
 <?php
 $host = 'localhost';
+$porta = '3307';
 $dbname = 'atendelab';
 $user = 'root';
 $password = '';
 try {
  $pdo = new PDO(
- "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
+ "mysql:host=$host;port=$porta;dbname=$dbname;charset=utf8mb4",
  $user,
  $password
  );

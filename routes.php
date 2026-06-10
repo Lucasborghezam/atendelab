@@ -1,40 +1,38 @@
 <?php
-require_once __DIR__ . '/app/Controllers/UsuarioController.php';
+require_once __DIR__ . '/app/Controllers/UsuariosController.php';
 
 $controller = $_GET['controller'] ?? 'home';
-$action = $_GET['action'] ?? 'index';
+$action     = $_GET['action']     ?? 'index';
 
-if($controller=== 'usuario') {
-    $usuariosController= new UsuariosController
+if ($controller === 'usuarios') {
+    $usuariosController = new UsuariosController();
 
-    switch($action){
+    switch ($action) {
         case 'listar':
             $usuariosController->listar();
             break;
 
         case 'buscar':
             $usuariosController->buscarPorId();
-            break
+            break;
 
         case 'criar':
             $usuariosController->criar();
-            break
-           
-        case 'atulizar':
-            $usuariosController->atualizae();
-            break
+            break;
+
+        case 'atualizar':
+            $usuariosController->atualizar();
+            break;
 
         case 'excluir':
             $usuariosController->excluir();
-            break        
+            break;
 
         default:
-        echo 'Ação de usuários não encontrada';
-        break;    
-
+            echo 'Ação de usuários não encontrada.';
+            break;
     }
-    
-}else {
+} else {
     echo '<h1>AtendeLab</h1>';
     echo '<p>Projeto em execução. Use ?controller=usuarios&action=listar para testar.</p>';
 }

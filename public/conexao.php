@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$porta = '3307';
+$porta = '3306';
 $dbname = 'atendelab';
 $user = 'root';
 $password = '';

@@ -41,7 +41,7 @@ if ($controller === 'auth') {
         case 'listar':
             $usuariosController->listar();
             break;
-        case 'buscar':
+        case 'buscarPorId':
             $usuariosController->buscarPorId();
             break;
         case 'criar':
@@ -67,7 +67,7 @@ if ($controller === 'auth') {
         case 'listar':
             $pessoasController->listar();
             break;
-        case 'buscar':
+        case 'buscarPorId':
             $pessoasController->buscarPorId();
             break;
         case 'criar':
@@ -75,6 +75,9 @@ if ($controller === 'auth') {
             break;
         case 'atualizar':
             $pessoasController->atualizar();
+            break;
+        case 'inativar':
+            $pessoasController->inativar();
             break;
         case 'excluir':
             $pessoasController->excluir();
@@ -119,7 +122,7 @@ if ($controller === 'auth') {
         case 'listar':
             $atendimentosController->listar();
             break;
-        case 'buscar':
+        case 'buscarPorId':
             $atendimentosController->buscarPorId();
             break;
         case 'criar':

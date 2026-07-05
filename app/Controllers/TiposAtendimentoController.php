@@ -2,12 +2,12 @@
 
 class TiposAtendimentoController
 {
-    
+
     private PDO $pdo;
 
     public function __construct()
     {
-        require_once __DIR__ . '/../../config/database.php';
+        $pdo = require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
 

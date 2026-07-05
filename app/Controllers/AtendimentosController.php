@@ -8,7 +8,7 @@ class AtendimentosController
     public function __construct()
     {
         
-        require_once __DIR__ . '/../../config/database.php';
+        $pdo = require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
 
@@ -25,6 +25,8 @@ class AtendimentosController
                     a.descricao_atendimento,
                     a.status,
                     a.data_atendimento,
+                    a.horario_atendimento,
+                    a.observacao_final,
                     a.atualizado_em
                 FROM atendimentos a
                 INNER JOIN pessoas           p ON p.id = a.pessoa_id
@@ -58,6 +60,8 @@ class AtendimentosController
                     a.descricao_atendimento,
                     a.status,
                     a.data_atendimento,
+                    a.horario_atendimento,
+                    a.observacao_final,
                     a.atualizado_em
                 FROM atendimentos a
                 INNER JOIN pessoas           p ON p.id = a.pessoa_id
@@ -88,7 +92,8 @@ class AtendimentosController
         $tipo_atendimento_id    = filter_input(INPUT_POST, 'tipo_atendimento_id',    FILTER_VALIDATE_INT);
         $usuario_id             = filter_input(INPUT_POST, 'usuario_id',             FILTER_VALIDATE_INT);
         $descricao_atendimento  = trim($_POST['descricao_atendimento'] ?? '');
-        $status                 = $_POST['status'] ?? 'concluido';
+        $horario_atendimento    = trim($_POST['horario_atendimento'] ?? '');
+        $status                 = $_POST['status'] ?? 'aberto';
 
         if (!$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '') {
             http_response_code(400);
@@ -96,21 +101,22 @@ class AtendimentosController
             return;
         }
 
-        if (!in_array($status, ['em_andamento', 'concluido', 'cancelado'], true)) {
+        if (!in_array($status, ['aberto', 'em_andamento', 'concluido'], true)) {
             http_response_code(400);
-            echo json_encode(['erro' => 'Status inválido. Use: em_andamento, concluido ou cancelado.']);
+            echo json_encode(['erro' => 'Status inválido. Use: aberto, em_andamento ou concluido.']);
             return;
         }
 
         try {
-            $sql = 'INSERT INTO atendimentos (pessoa_id, tipo_atendimento_id, usuario_id, descricao_atendimento, status)
-                    VALUES (:pessoa_id, :tipo_atendimento_id, :usuario_id, :descricao_atendimento, :status)';
+            $sql = 'INSERT INTO atendimentos (pessoa_id, tipo_atendimento_id, usuario_id, descricao_atendimento, horario_atendimento, status)
+                    VALUES (:pessoa_id, :tipo_atendimento_id, :usuario_id, :descricao_atendimento, :horario_atendimento, :status)';
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':pessoa_id',             $pessoa_id,             PDO::PARAM_INT);
             $stmt->bindValue(':tipo_atendimento_id',   $tipo_atendimento_id,   PDO::PARAM_INT);
             $stmt->bindValue(':usuario_id',            $usuario_id,            PDO::PARAM_INT);
             $stmt->bindValue(':descricao_atendimento', $descricao_atendimento);
+            $stmt->bindValue(':horario_atendimento',   $horario_atendimento ?: null);
             $stmt->bindValue(':status',                $status);
             $stmt->execute();
 
@@ -129,8 +135,9 @@ class AtendimentosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        $id     = filter_input(INPUT_POST, 'id',     FILTER_VALIDATE_INT);
-        $status = $_POST['status'] ?? '';
+        $id               = filter_input(INPUT_POST, 'id',     FILTER_VALIDATE_INT);
+        $status           = $_POST['status'] ?? '';
+        $observacao_final = trim($_POST['observacao_final'] ?? '');
 
         if (!$id || $status === '') {
             http_response_code(400);
@@ -138,17 +145,24 @@ class AtendimentosController
             return;
         }
 
-        if (!in_array($status, ['em_andamento', 'concluido', 'cancelado'], true)) {
+        if (!in_array($status, ['aberto', 'em_andamento', 'concluido'], true)) {
             http_response_code(400);
-            echo json_encode(['erro' => 'Status inválido. Use: em_andamento, concluido ou cancelado.']);
+            echo json_encode(['erro' => 'Status inválido. Use: aberto, em_andamento ou concluido.']);
+            return;
+        }
+
+        if ($status === 'concluido' && $observacao_final === '') {
+            http_response_code(400);
+            echo json_encode(['erro' => 'Informe a observação final para concluir o atendimento.']);
             return;
         }
 
         try {
-            $sql  = 'UPDATE atendimentos SET status = :status WHERE id = :id';
+            $sql  = 'UPDATE atendimentos SET status = :status, observacao_final = :observacao_final WHERE id = :id';
             $stmt = $this->pdo->prepare($sql);
-            $stmt->bindValue(':status', $status);
-            $stmt->bindValue(':id',     $id, PDO::PARAM_INT);
+            $stmt->bindValue(':status',            $status);
+            $stmt->bindValue(':observacao_final',  $observacao_final ?: null);
+            $stmt->bindValue(':id',                $id, PDO::PARAM_INT);
             $stmt->execute();
 
             echo json_encode(['mensagem' => 'Status do atendimento atualizado com sucesso.'], JSON_UNESCAPED_UNICODE);
@@ -167,7 +181,8 @@ class AtendimentosController
         $tipo_atendimento_id   = filter_input(INPUT_POST, 'tipo_atendimento_id',   FILTER_VALIDATE_INT);
         $usuario_id            = filter_input(INPUT_POST, 'usuario_id',            FILTER_VALIDATE_INT);
         $descricao_atendimento = trim($_POST['descricao_atendimento'] ?? '');
-        $status                = $_POST['status'] ?? 'concluido';
+        $horario_atendimento   = trim($_POST['horario_atendimento'] ?? '');
+        $status                = $_POST['status'] ?? 'aberto';
 
         if (!$id || !$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '') {
             http_response_code(400);
@@ -175,9 +190,9 @@ class AtendimentosController
             return;
         }
 
-        if (!in_array($status, ['em_andamento', 'concluido', 'cancelado'], true)) {
+        if (!in_array($status, ['aberto', 'em_andamento', 'concluido'], true)) {
             http_response_code(400);
-            echo json_encode(['erro' => 'Status inválido. Use: em_andamento, concluido ou cancelado.']);
+            echo json_encode(['erro' => 'Status inválido. Use: aberto, em_andamento ou concluido.']);
             return;
         }
 
@@ -187,6 +202,7 @@ class AtendimentosController
                         tipo_atendimento_id   = :tipo_atendimento_id,
                         usuario_id            = :usuario_id,
                         descricao_atendimento = :descricao_atendimento,
+                        horario_atendimento   = :horario_atendimento,
                         status                = :status
                     WHERE id = :id';
 
@@ -195,6 +211,7 @@ class AtendimentosController
             $stmt->bindValue(':tipo_atendimento_id',   $tipo_atendimento_id,   PDO::PARAM_INT);
             $stmt->bindValue(':usuario_id',            $usuario_id,            PDO::PARAM_INT);
             $stmt->bindValue(':descricao_atendimento', $descricao_atendimento);
+            $stmt->bindValue(':horario_atendimento',   $horario_atendimento ?: null);
             $stmt->bindValue(':status',                $status);
             $stmt->bindValue(':id',                    $id,                    PDO::PARAM_INT);
             $stmt->execute();

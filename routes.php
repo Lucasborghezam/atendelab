@@ -3,12 +3,38 @@ require_once __DIR__ . '/app/Controllers/UsuariosController.php';
 require_once __DIR__ . '/app/Controllers/PessoasController.php';
 require_once __DIR__ . '/app/Controllers/TiposAtendimentoController.php';
 require_once __DIR__ . '/app/Controllers/AtendimentosController.php';
+require_once __DIR__ . '/app/Controllers/AuthController.php';
+require_once __DIR__ . '/app/Middleware/auth.php';
 
-$controller = $_GET['controller'] ?? 'home';
-$action     = $_GET['action']     ?? 'index';
+$controller = $_GET['controller'] ?? 'auth';
+$action     = $_GET['action']     ?? 'login';
 
-//USUARIOS
-if ($controller === 'usuarios') {
+// AUTH
+if ($controller === 'auth') {
+    $authController = new AuthController();
+
+    switch ($action) {
+        case 'login':
+            $authController->exibirLogin();
+            break;
+        case 'entrar':
+            $authController->entrar();
+            break;
+        case 'dashboard':
+            $authController->dashboard();
+            break;
+        case 'logout':
+            $authController->logout();
+            break;
+        default:
+            http_response_code(404);
+            echo 'Ação de autenticação não encontrada.';
+            break;
+    }
+
+// USUARIOS
+} elseif ($controller === 'usuarios') {
+    exigirAutenticacao();
     $usuariosController = new UsuariosController();
 
     switch ($action) {
@@ -28,14 +54,15 @@ if ($controller === 'usuarios') {
             $usuariosController->excluir();
             break;
         default:
-            echo json_encode(['erro' => 'Ação de usuários não encontrada.']);
+            echo 'Ação de usuários não encontrada.';
             break;
     }
 
-//PESSOAS
+// PESSOAS
 } elseif ($controller === 'pessoas') {
+    exigirAutenticacao();
     $pessoasController = new PessoasController();
- 
+
     switch ($action) {
         case 'listar':
             $pessoasController->listar();
@@ -53,13 +80,13 @@ if ($controller === 'usuarios') {
             $pessoasController->excluir();
             break;
         default:
-            echo json_encode(['erro' => 'Ação de pessoas não encontrada.']);
+            echo 'Ação de pessoas não encontrada.';
             break;
     }
- 
 
-//TIPOS DE ATENDIMENTO 
+// TIPOS DE ATENDIMENTO
 } elseif ($controller === 'tipos_atendimento') {
+    exigirAutenticacao();
     $tiposController = new TiposAtendimentoController();
 
     switch ($action) {
@@ -79,15 +106,15 @@ if ($controller === 'usuarios') {
             $tiposController->inativar();
             break;
         default:
-            echo json_encode(['erro' => 'Ação de tipos de atendimento não encontrada.']);
+            echo 'Ação de tipos de atendimento não encontrada.';
             break;
     }
 
-
-//ATENDIMENTOS
+// ATENDIMENTOS
 } elseif ($controller === 'atendimentos') {
+    exigirAutenticacao();
     $atendimentosController = new AtendimentosController();
- 
+
     switch ($action) {
         case 'listar':
             $atendimentosController->listar();
@@ -105,9 +132,9 @@ if ($controller === 'usuarios') {
             $atendimentosController->atualizarStatus();
             break;
         default:
-            echo json_encode(['erro' => 'Ação de atendimentos não encontrada.']);
+            echo 'Ação de atendimentos não encontrada.';
             break;
-    }    
+    }
 
 // HOME
 } else {

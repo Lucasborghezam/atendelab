@@ -1,15 +1,18 @@
 <?php
-$host    = 'localhost';
-$db      = 'atendelab';
-$user    = 'root';
-$pass    = '';
-$charset = 'utf8mb4';
+$host = 'localhost';
+$porta = '3306';
+$dbname = 'atendelab';
+$user = 'root';
+$password = '';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+try {
+    $pdo = new PDO(
+        "mysql:host=$host;port=$porta;dbname=$dbname;charset=utf8mb4",
+        $user,
+        $password
+    );
 
-$opcoes = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
-
-$pdo = new PDO($dsn, $user, $pass, $opcoes);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die('Erro ao conectar com o banco de dados: ' . $e->getMessage());
+}

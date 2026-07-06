@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../config/database.php';
-
 require_once __DIR__ . '/../Middleware/auth.php';
 
 class AuthController
@@ -10,8 +8,7 @@ class AuthController
 
     public function __construct()
     {
-        global $pdo;
-
+        $pdo = require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
 
@@ -22,8 +19,8 @@ class AuthController
             exit;
         }
 
-        $erro     = $_SESSION['erro_login'] ?? null;
-        $mensagem = $_SESSION['mensagem']   ?? null;
+        $erroLogin = $_SESSION['erro_login'] ?? null;
+        $mensagem  = $_SESSION['mensagem']   ?? null;
 
         unset($_SESSION['erro_login'], $_SESSION['mensagem']);
 

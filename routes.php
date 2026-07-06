@@ -4,6 +4,9 @@ require_once __DIR__ . '/app/Controllers/PessoasController.php';
 require_once __DIR__ . '/app/Controllers/TiposAtendimentoController.php';
 require_once __DIR__ . '/app/Controllers/AtendimentosController.php';
 require_once __DIR__ . '/app/Controllers/AuthController.php';
+require_once __DIR__ . '/app/Controllers/DashboardController.php';
+require_once __DIR__ . '/app/Controllers/FrontendController.php';
+require_once __DIR__ . '/app/Controllers/RelatoriosController.php';
 require_once __DIR__ . '/app/Middleware/auth.php';
 
 $controller = $_GET['controller'] ?? 'auth';
@@ -136,6 +139,56 @@ if ($controller === 'auth') {
             break;
         default:
             echo 'Ação de atendimentos não encontrada.';
+            break;
+    }
+
+// DASHBOARD
+} elseif ($controller === 'dashboard') {
+    exigirAutenticacao();
+    $dashboardController = new DashboardController();
+
+    switch ($action) {
+        case 'resumo':
+            $dashboardController->resumo();
+            break;
+        default:
+            http_response_code(404);
+            echo 'Ação de dashboard não encontrada.';
+            break;
+    }
+
+// FRONTEND 
+} elseif ($controller === 'frontend') {
+    $frontendController = new FrontendController();
+
+    switch ($action) {
+        case 'pessoas':
+            $frontendController->pessoas();
+            break;
+        case 'tiposAtendimentos':
+            $frontendController->tiposAtendimentos();
+            break;
+        case 'atendimentos':
+            $frontendController->atendimentos();
+            break;
+        default:
+            http_response_code(404);
+            echo 'Página não encontrada.';
+            break;
+    }
+
+// RELATORIOS
+} elseif ($controller === 'relatorios') {
+    exigirAutenticacao();
+    $relatoriosController = new RelatoriosController();
+
+    switch ($action) {
+        case 'atendimentos':
+            $relatoriosController->atendimentos();
+            break;
+        default:
+            http_response_code(404);
+            echo 'Ação de relatórios não encontrada.';
             break;
     }
 

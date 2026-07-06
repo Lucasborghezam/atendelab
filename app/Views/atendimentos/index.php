@@ -227,7 +227,7 @@ function abrirStatus(id, status) {
 document.getElementById('formStatus').addEventListener('submit', async event => {
     event.preventDefault();
     try {
-        await AtendeLabApi.post('atendimentos', 'alterarStatus', new FormData(event.target));
+        await AtendeLabApi.post('atendimentos', 'atualizarStatus', new FormData(event.target));
         statusModal().hide();
         AtendeLabApi.showAlert('alerta', 'Status atualizado com sucesso.');
         await carregarAtendimentos();

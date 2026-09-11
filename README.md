@@ -9,11 +9,14 @@ Repositório: https://github.com/Lucasborghezam/atendelab
 
 O AtendeLab é um sistema para gerenciamento de atendimentos acadêmicos: cadastro de
 pessoas atendidas, tipos de atendimento e registro dos atendimentos propriamente ditos,
-com autenticação, dashboard de indicadores e relatórios por período.
+com autenticação, gestão de usuários, dashboard de indicadores e relatórios por período.
 
 O projeto é construído em PHP puro, sem framework, seguindo uma arquitetura MVC simples.
-O acesso ao banco de dados é feito com PDO e prepared statements, a autenticação é
-baseada em sessão, e o frontend consome uma API interna via JavaScript.
+Um front controller único (`routes.php`) concentra o roteamento: ele recebe os
+parâmetros `controller` e `action` via query string e despacha para o método
+correspondente. O acesso ao banco de dados usa PDO e prepared statements, a
+autenticação usa sessão, e o frontend (HTML + JavaScript) consome essa API
+interna via `fetch`.
 
 ## Tecnologias
 
@@ -26,10 +29,11 @@ baseada em sessão, e o frontend consome uma API interna via JavaScript.
 
 ## Funcionalidades
 
-- Autenticação com sessão e proteção de rotas
+- Autenticação com sessão e proteção de rotas (middleware)
 - Dashboard com indicadores gerais
-- Cadastro de pessoas atendidas, com inativação lógica 
-- Cadastro de tipos de atendimento
+- Gestão de usuários (CRUD)
+- Cadastro de pessoas atendidas, com inativação lógica
+- Cadastro de tipos de atendimento, com inativação lógica
 - Registro e acompanhamento de atendimentos, com controle de status
 - Relatório de atendimentos por período
 
@@ -38,17 +42,34 @@ baseada em sessão, e o frontend consome uma API interna via JavaScript.
 ```
 atendelab/
 ├── app/
-│   ├── Controllers/     regras de negócio e endpoints da aplicação
-│   ├── Middleware/       autenticação e proteção de rotas
-│   └── Views/            páginas HTML renderizadas pelo backend
+│   ├── Controllers/            regras de negócio e endpoints da aplicação
+│   │   ├── AuthController.php           login, sessão e logout
+│   │   ├── UsuariosController.php       CRUD de usuários
+│   │   ├── PessoasController.php        CRUD de pessoas atendidas
+│   │   ├── TiposAtendimentoController.php  CRUD de tipos de atendimento
+│   │   ├── AtendimentosController.php   CRUD e status de atendimentos
+│   │   ├── DashboardController.php      indicadores gerais
+│   │   ├── RelatoriosController.php     relatório por período
+│   │   └── FrontendController.php       renderização das páginas (views)
+│   ├── Middleware/
+│   │   └── auth.php             proteção de rotas autenticadas
+│   └── Views/                    páginas HTML renderizadas pelo backend
+│       ├── auth/                 tela de login
+│       ├── dashboard/            tela de indicadores
+│       ├── pessoas/               tela de pessoas atendidas
+│       ├── tipos-atendimento/     tela de tipos de atendimento
+│       ├── atendimentos/         tela de atendimentos
+│       └── layouts/              header, sidebar e footer compartilhados
 ├── config/
-│   └── database.php      conexão com o banco via PDO
+│   └── database.php              conexão com o banco via PDO
 ├── database/
-│   └── atendelab.sql      script de criação do schema e dados iniciais
+│   └── atendelab.sql             script de criação do schema e dados iniciais
 ├── public/
-│   ├── index.php          ponto de entrada da aplicação
-│   └── assets/            arquivos estáticos (CSS e JavaScript)
-├── routes.php             roteador da aplicação (controller + action)
+│   ├── index.php                 ponto de entrada da aplicação
+│   └── assets/
+│       ├── css/style.css         estilos da aplicação
+│       └── js/api.js             consumo da API interna via fetch
+├── routes.php                    roteador da aplicação (controller + action)
 └── README.md
 ```
 
@@ -66,4 +87,3 @@ atendelab/
 5. Importe o script `database/atendelab.sql` pelo phpMyAdmin.
 6. Verifique as credenciais de acesso em `config/database.php`.
 7. Acesse a aplicação em `http://localhost/atendelab/public/`.
-

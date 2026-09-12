@@ -2,12 +2,10 @@
 
 class AtendimentosController
 {
-
     private PDO $pdo;
 
     public function __construct()
     {
-
         $pdo = require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
@@ -15,7 +13,6 @@ class AtendimentosController
     public function listar(): void
     {
         header('Content-Type: application/json; charset=utf-8');
-
 
         $sql = 'SELECT
                     a.id,

@@ -1,7 +1,6 @@
 <?php
 class UsuariosController
 {
-    // Conexão PDO reutilizada em todos os métodos.
     private PDO $pdo;
 
     public function __construct()
@@ -12,9 +11,7 @@ class UsuariosController
 
     public function listar(): void
     {
-
         header('Content-Type: application/json; charset=utf-8');
-
 
         $sql = 'SELECT id, nome, email, perfil, status, criado_em
                 FROM usuarios
@@ -23,14 +20,12 @@ class UsuariosController
         $stmt = $this->pdo->query($sql);
         $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
         echo json_encode($usuarios, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     public function buscarPorId(): void
     {
         header('Content-Type: application/json; charset=utf-8');
-
 
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
@@ -39,7 +34,6 @@ class UsuariosController
             echo json_encode(['erro' => 'ID inválido.']);
             return;
         }
-
 
         $sql = 'SELECT id, nome, email, perfil, status, criado_em
                 FROM usuarios
@@ -64,13 +58,11 @@ class UsuariosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-
         $nome   = trim($_POST['nome']   ?? '');
         $email  = trim($_POST['email']  ?? '');
         $senha  = $_POST['senha']  ?? '';
         $perfil = $_POST['perfil'] ?? 'atendente';
         $status = $_POST['status'] ?? 'ativo';
-
 
         if ($nome === '' || $email === '' || $senha === '') {
             http_response_code(400);
@@ -84,7 +76,6 @@ class UsuariosController
             return;
         }
 
-
         if (!in_array($perfil, ['admin', 'aluno', 'atendente'], true)) {
             http_response_code(400);
             echo json_encode(['erro' => 'Perfil inválido.']);
@@ -96,7 +87,6 @@ class UsuariosController
             echo json_encode(['erro' => 'Status inválido.']);
             return;
         }
-
 
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
@@ -118,7 +108,6 @@ class UsuariosController
                 'id'       => $this->pdo->lastInsertId()
             ], JSON_UNESCAPED_UNICODE);
         } catch (PDOException $e) {
-
             http_response_code(500);
             echo json_encode(['erro' => 'Erro ao cadastrar usuário.']);
         }
@@ -127,7 +116,6 @@ class UsuariosController
     public function atualizar(): void
     {
         header('Content-Type: application/json; charset=utf-8');
-
 
         $id     = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $nome   = trim($_POST['nome']   ?? '');
@@ -185,7 +173,6 @@ class UsuariosController
     public function excluir(): void
     {
         header('Content-Type: application/json; charset=utf-8');
-
 
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 

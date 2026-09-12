@@ -1,5 +1,4 @@
 <?php
-// Controller responsável pelos dados exibidos no dashboard.
 class DashboardController
 {
     private PDO $pdo;

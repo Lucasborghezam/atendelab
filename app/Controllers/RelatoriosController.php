@@ -35,7 +35,7 @@ class RelatoriosController
                     JOIN pessoas           p ON p.id = a.pessoa_id
                     JOIN tipos_atendimento t ON t.id = a.tipo_atendimento_id
                     JOIN usuarios          u ON u.id = a.usuario_id
-                    WHERE a.data_atendimento BETWEEN :inicio AND :fim
+                    WHERE DATE(a.data_atendimento) BETWEEN :inicio AND :fim
                     ORDER BY a.data_atendimento ASC, a.horario_atendimento ASC";
 
             $stmt = $this->pdo->prepare($sql);

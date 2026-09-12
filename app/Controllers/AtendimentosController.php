@@ -2,12 +2,12 @@
 
 class AtendimentosController
 {
-    
+
     private PDO $pdo;
 
     public function __construct()
     {
-        
+
         $pdo = require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
@@ -16,8 +16,8 @@ class AtendimentosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        
-        $sql = 'SELECT 
+
+        $sql = 'SELECT
                     a.id,
                     p.nome         AS pessoa,
                     t.nome         AS tipo_atendimento,
@@ -52,7 +52,7 @@ class AtendimentosController
             return;
         }
 
-        $sql = 'SELECT 
+        $sql = 'SELECT
                     a.id,
                     p.nome         AS pessoa,
                     t.nome         AS tipo_atendimento,
@@ -92,12 +92,13 @@ class AtendimentosController
         $tipo_atendimento_id    = filter_input(INPUT_POST, 'tipo_atendimento_id',    FILTER_VALIDATE_INT);
         $usuario_id             = filter_input(INPUT_POST, 'usuario_id',             FILTER_VALIDATE_INT);
         $descricao_atendimento  = trim($_POST['descricao_atendimento'] ?? '');
+        $data_atendimento       = trim($_POST['data_atendimento'] ?? '');
         $horario_atendimento    = trim($_POST['horario_atendimento'] ?? '');
         $status                 = $_POST['status'] ?? 'aberto';
 
-        if (!$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '') {
+        if (!$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '' || $data_atendimento === '') {
             http_response_code(400);
-            echo json_encode(['erro' => 'pessoa_id, tipo_atendimento_id, usuario_id e descricao_atendimento são obrigatórios.']);
+            echo json_encode(['erro' => 'pessoa_id, tipo_atendimento_id, usuario_id, descricao_atendimento e data_atendimento são obrigatórios.']);
             return;
         }
 
@@ -108,14 +109,15 @@ class AtendimentosController
         }
 
         try {
-            $sql = 'INSERT INTO atendimentos (pessoa_id, tipo_atendimento_id, usuario_id, descricao_atendimento, horario_atendimento, status)
-                    VALUES (:pessoa_id, :tipo_atendimento_id, :usuario_id, :descricao_atendimento, :horario_atendimento, :status)';
+            $sql = 'INSERT INTO atendimentos (pessoa_id, tipo_atendimento_id, usuario_id, descricao_atendimento, data_atendimento, horario_atendimento, status)
+                    VALUES (:pessoa_id, :tipo_atendimento_id, :usuario_id, :descricao_atendimento, :data_atendimento, :horario_atendimento, :status)';
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':pessoa_id',             $pessoa_id,             PDO::PARAM_INT);
             $stmt->bindValue(':tipo_atendimento_id',   $tipo_atendimento_id,   PDO::PARAM_INT);
             $stmt->bindValue(':usuario_id',            $usuario_id,            PDO::PARAM_INT);
             $stmt->bindValue(':descricao_atendimento', $descricao_atendimento);
+            $stmt->bindValue(':data_atendimento',      $data_atendimento);
             $stmt->bindValue(':horario_atendimento',   $horario_atendimento ?: null);
             $stmt->bindValue(':status',                $status);
             $stmt->execute();
@@ -181,10 +183,11 @@ class AtendimentosController
         $tipo_atendimento_id   = filter_input(INPUT_POST, 'tipo_atendimento_id',   FILTER_VALIDATE_INT);
         $usuario_id            = filter_input(INPUT_POST, 'usuario_id',            FILTER_VALIDATE_INT);
         $descricao_atendimento = trim($_POST['descricao_atendimento'] ?? '');
+        $data_atendimento      = trim($_POST['data_atendimento'] ?? '');
         $horario_atendimento   = trim($_POST['horario_atendimento'] ?? '');
         $status                = $_POST['status'] ?? 'aberto';
 
-        if (!$id || !$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '') {
+        if (!$id || !$pessoa_id || !$tipo_atendimento_id || !$usuario_id || $descricao_atendimento === '' || $data_atendimento === '') {
             http_response_code(400);
             echo json_encode(['erro' => 'Todos os campos são obrigatórios.']);
             return;
@@ -202,6 +205,7 @@ class AtendimentosController
                         tipo_atendimento_id   = :tipo_atendimento_id,
                         usuario_id            = :usuario_id,
                         descricao_atendimento = :descricao_atendimento,
+                        data_atendimento      = :data_atendimento,
                         horario_atendimento   = :horario_atendimento,
                         status                = :status
                     WHERE id = :id';
@@ -211,6 +215,7 @@ class AtendimentosController
             $stmt->bindValue(':tipo_atendimento_id',   $tipo_atendimento_id,   PDO::PARAM_INT);
             $stmt->bindValue(':usuario_id',            $usuario_id,            PDO::PARAM_INT);
             $stmt->bindValue(':descricao_atendimento', $descricao_atendimento);
+            $stmt->bindValue(':data_atendimento',      $data_atendimento);
             $stmt->bindValue(':horario_atendimento',   $horario_atendimento ?: null);
             $stmt->bindValue(':status',                $status);
             $stmt->bindValue(':id',                    $id,                    PDO::PARAM_INT);

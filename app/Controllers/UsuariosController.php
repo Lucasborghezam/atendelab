@@ -6,17 +6,17 @@ class UsuariosController
 
     public function __construct()
     {
-        
+
         require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
 
     public function listar(): void
     {
-        
+
         header('Content-Type: application/json; charset=utf-8');
 
-        
+
         $sql = 'SELECT id, nome, email, perfil, status, criado_em
                 FROM usuarios
                 ORDER BY id DESC';
@@ -24,7 +24,7 @@ class UsuariosController
         $stmt = $this->pdo->query($sql);
         $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        
+
         echo json_encode($usuarios, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
@@ -32,7 +32,7 @@ class UsuariosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        
+
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
         if (!$id) {
@@ -41,7 +41,7 @@ class UsuariosController
             return;
         }
 
-        
+
         $sql = 'SELECT id, nome, email, perfil, status, criado_em
                 FROM usuarios
                 WHERE id = :id';
@@ -65,14 +65,14 @@ class UsuariosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        
+
         $nome   = trim($_POST['nome']   ?? '');
         $email  = trim($_POST['email']  ?? '');
         $senha  = $_POST['senha']  ?? '';
         $perfil = $_POST['perfil'] ?? 'atendente';
         $status = $_POST['status'] ?? 'ativo';
 
-        
+
         if ($nome === '' || $email === '' || $senha === '') {
             http_response_code(400);
             echo json_encode(['erro' => 'Nome, e-mail e senha são obrigatórios.']);
@@ -85,7 +85,7 @@ class UsuariosController
             return;
         }
 
-        
+
         if (!in_array($perfil, ['admin', 'aluno', 'atendente'], true)) {
             http_response_code(400);
             echo json_encode(['erro' => 'Perfil inválido.']);
@@ -98,13 +98,7 @@ class UsuariosController
             return;
         }
 
-        if (!in_array($perfil, ['admin', 'aluno', 'atendente'], true)) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Perfil inválido.']);
-            return;
-        }
 
-        
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
         try {
@@ -125,7 +119,7 @@ class UsuariosController
                 'id'       => $this->pdo->lastInsertId()
             ], JSON_UNESCAPED_UNICODE);
         } catch (PDOException $e) {
-            
+
             http_response_code(500);
             echo json_encode(['erro' => 'Erro ao cadastrar usuário.']);
         }
@@ -135,7 +129,7 @@ class UsuariosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        
+
         $id     = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $nome   = trim($_POST['nome']   ?? '');
         $email  = trim($_POST['email']  ?? '');
@@ -165,13 +159,6 @@ class UsuariosController
             echo json_encode(['erro' => 'Status inválido.']);
             return;
         }
-        
-        if (!in_array($perfil, ['admin', 'aluno', 'atendente'], true)) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Perfil inválido.']);
-            return;
-        }
-
 
         try {
             $sql = 'UPDATE usuarios
@@ -200,7 +187,7 @@ class UsuariosController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        
+
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
         if (!$id) {
